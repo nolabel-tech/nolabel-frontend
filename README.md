@@ -1,5 +1,10 @@
 # nolabel-frontend
 
+# badges
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nolabel-tech_nolabel-frontend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=nolabel-tech_nolabel-frontend)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=nolabel-tech_nolabel-frontend&metric=bugs)](https://sonarcloud.io/summary/new_code?id=nolabel-tech_nolabel-frontend)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=nolabel-tech_nolabel-frontend&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=nolabel-tech_nolabel-frontend)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=nolabel-tech_nolabel-frontend&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=nolabel-tech_nolabel-frontend)
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
