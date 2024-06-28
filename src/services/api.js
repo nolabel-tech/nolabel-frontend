@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = "python-app-service"; 
+const API_URL = process.env.REACT_APP_API_URL; 
 console.log('API URL:', API_URL);
 
 
