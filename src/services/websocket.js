@@ -1,8 +1,9 @@
 const WebSocketClient = (() => {
     let instance;
+    const WS_URL = process.env.REACT_APP_WS_URL;
 
     function createInstance() {
-        const socket = new WebSocket('ws://127.0.0.1:8000/ws/chat/');
+        const socket = new WebSocket(WS_URL);
 
         socket.onopen = () => {
             console.log('WebSocket Client Connected');

@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'http://127.0.0.1:8000'; 
+const API_URL = process.env.REACT_APP_API_URL; 
+
 export const register = (email, username, unique, password) => {
     return axios.post(`${API_URL}/api/register/`, { email, username, unique, password });
 };
@@ -12,8 +13,6 @@ export const login = (username, password) => {
 export const getContact = (username, email) => {
     return axios.post(`${API_URL}/api/contact/`, { username, email });
 };
-
-
 
 export const addContact = (username, email) => {
     const unique = localStorage.getItem('unique');  
