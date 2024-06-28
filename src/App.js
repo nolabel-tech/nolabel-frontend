@@ -1,25 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Login from './components/Login';
+import Register from './components/Register';
+import Chat from './components/Chat';
+import Contacts from './components/Contacts';
+import AddContact from './components/AddContact';
+import Messenger from './components/Messenger';
+import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 
-function App() {
+const theme = createTheme();
+
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/contacts" element={<Contacts />} />
+          <Route path="/add-contact" element={<AddContact />} />
+          <Route path="/messenger" element={<Messenger />} />
+          <Route path="/" element={<Login />} />
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
-}
+};
 
 export default App;
