@@ -3,5 +3,5 @@ kind: ConfigMap
 metadata:
   name: nodejs-app-config
 data:
-  REACT_APP_API_URL: "python-app-service"
+  REACT_APP_API_URL: "https://back.sm2.fun"
   REACT_APP_WS_URL: "ws://python-app-service/ws/chat/"
