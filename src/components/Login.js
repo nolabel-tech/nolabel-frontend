@@ -13,6 +13,7 @@ const Login = () => {
       const response = await login(username, password);
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('unique', response.data.unique); // Сохраняем уникальный идентификатор пользователя
+      localStorage.setItem('username', username); // Сохраняем имя пользователя
       navigate('/messenger');
     } catch (error) {
       console.error('Login error', error);
