@@ -15,7 +15,10 @@ spec:
         app: nodejs-app
     spec:
       containers:
-      - name: python-app
+      - name: nodejs-app
         image: nolabelregistry/nolabel-frontend:latest
         ports:
         - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: nodejs-app-config
