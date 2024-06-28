@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: nodejs-app-config
 data:
-  API_URL: "http://python-app-service.default.svc.cluster.local"
+  API_URL: "python-app-service"
