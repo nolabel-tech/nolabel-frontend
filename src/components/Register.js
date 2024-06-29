@@ -8,16 +8,70 @@ const Register = () => {
   const [username, setUsername] = useState('');
   const [unique, setUnique] = useState('');
   const [password, setPassword] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [uniqueError, setUniqueError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [serverError, setServerError] = useState('');
   const navigate = useNavigate();
 
+  const validateEmail = (value) => {
+    if (!value) {
+      setEmailError('Email is required');
+      return false;
+    }
+    if (!/\S+@\S+\.\S+/.test(value)) {
+      setEmailError('Email is not valid');
+      return false;
+    }
+    setEmailError('');
+    return true;
+  };
+
+  const validateUsername = (value) => {
+    if (!value) {
+      setUsernameError('Username is required');
+      return false;
+    }
+    setUsernameError('');
+    return true;
+  };
+
+  const validateUnique = (value) => {
+    if (!value) {
+      setUniqueError('Unique Identifier is required');
+      return false;
+    }
+    setUniqueError('');
+    return true;
+  };
+
+  const validatePassword = (value) => {
+    if (!value) {
+      setPasswordError('Password is required');
+      return false;
+    }
+    setPasswordError('');
+    return true;
+  };
+
   const handleRegister = async () => {
-    try {
-      const response = await register(email, username, unique, password);
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('unique', response.data.unique);
-      navigate('/login');
-    } catch (error) {
-      console.error('Registration error', error);
+    const isEmailValid = validateEmail(email);
+    const isUsernameValid = validateUsername(username);
+    const isUniqueValid = validateUnique(unique);
+    const isPasswordValid = validatePassword(password);
+
+    if (isEmailValid && isUsernameValid && isUniqueValid && isPasswordValid) {
+      try {
+        const response = await register(email, username, unique, password);
+        localStorage.clear(); // Очистить предыдущие данные
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('unique', response.data.unique);
+        navigate('/login');
+      } catch (error) {
+        console.error('Registration error', error);
+        setServerError(error.response.data.error || 'An error occurred');
+      }
     }
   };
 
@@ -42,6 +96,9 @@ const Register = () => {
             label="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            onBlur={() => validateEmail(email)}
+            helperText={emailError || 'Enter your email address'}
+            error={Boolean(emailError)}
           />
           <TextField
             margin="normal"
@@ -50,6 +107,9 @@ const Register = () => {
             label="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            onBlur={() => validateUsername(username)}
+            helperText={usernameError || 'Enter your username'}
+            error={Boolean(usernameError)}
           />
           <TextField
             margin="normal"
@@ -58,6 +118,9 @@ const Register = () => {
             label="Unique Identifier"
             value={unique}
             onChange={(e) => setUnique(e.target.value)}
+            onBlur={() => validateUnique(unique)}
+            helperText={uniqueError || 'Enter a unique identifier'}
+            error={Boolean(uniqueError)}
           />
           <TextField
             margin="normal"
@@ -67,7 +130,15 @@ const Register = () => {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onBlur={() => validatePassword(password)}
+            helperText={passwordError || 'Enter your password'}
+            error={Boolean(passwordError)}
           />
+          {serverError && (
+            <Typography color="error" variant="body2">
+              {serverError}
+            </Typography>
+          )}
           <Button
             fullWidth
             variant="contained"

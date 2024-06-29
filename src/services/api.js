@@ -1,8 +1,10 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL; 
-console.log('API URL:', API_URL);
+const API_URL = process.env.REACT_APP_API_URL;
 
+export const updateUserDetails = (unique, details) => {
+    return axios.post(`${API_URL}/api/update_user/`, { unique, ...details });
+};
 
 export const register = (email, username, unique, password) => {
     return axios.post(`${API_URL}/api/register/`, { email, username, unique, password });
