@@ -19,6 +19,7 @@ const Messenger = () => {
 
   const unique = localStorage.getItem('unique');
   const username = localStorage.getItem('username');
+  const wsUrl = process.env.REACT_APP_WS_URL;
 
   useEffect(() => {
     initDB()
@@ -44,12 +45,12 @@ const Messenger = () => {
         username: newContactUsername,
         email: newContactEmail,
         unique: response.data.unique,
-        roomId: response.data.room_id  // Получаем ID комнаты от сервера
+        roomId: response.data.room_id
       };
       const updatedContacts = [...contacts, newContact];
       setContacts(updatedContacts);
       localStorage.setItem('contacts', JSON.stringify(updatedContacts));
-      await saveContact(newContact); // Сохранение контакта в базу данных
+      await saveContact(newContact);
       setOpen(false);
     } catch (error) {
       console.error('Error adding contact', error);
@@ -67,7 +68,7 @@ const Messenger = () => {
       }
 
       const roomId = contact.roomId || await getRoomId(contact.unique);
-      const socketInstance = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomId}/`);
+      const socketInstance = new WebSocket(`${wsUrl}${roomId}/`);
       setSocket(socketInstance);
 
       socketInstance.onopen = () => {
