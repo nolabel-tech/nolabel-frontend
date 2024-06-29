@@ -13,8 +13,11 @@ export const getContact = (username, email) => {
     return axios.post(`${API_URL}/api/contact/`, { username, email });
 };
 
-export const addContact = (token, username, email) => {
-    return axios.post(`${API_URL}/api/contact/`, { username, email }, { headers: { Authorization: `Bearer ${token}` } });
+
+
+export const addContact = (username, email) => {
+    const unique = localStorage.getItem('unique');  
+    return axios.post(`${API_URL}/api/add_contact/`, { username, email, unique });
 };
 
 export const sendMessage = (token, unique, message, from_user) => {

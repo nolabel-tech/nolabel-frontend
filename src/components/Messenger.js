@@ -4,8 +4,8 @@ import AddIcon from '@mui/icons-material/Add';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import SendIcon from '@mui/icons-material/Send';
-import { saveMessage, getMessagesByRecipient, updateMessageStatus } from '../services/db';
-import { getContact } from '../services/api';
+import { saveMessage, getMessagesByRecipient, updateMessageStatus, saveContact, getRoomId, initDB } from '../services/db';
+import { addContact } from '../services/api';
 
 const Messenger = () => {
   const [contacts, setContacts] = useState([]);
@@ -18,10 +18,18 @@ const Messenger = () => {
   const [socket, setSocket] = useState(null);
 
   const unique = localStorage.getItem('unique');
+  const username = localStorage.getItem('username');
 
   useEffect(() => {
-    const savedContacts = JSON.parse(localStorage.getItem('contacts')) || [];
-    setContacts(savedContacts);
+    initDB()
+      .then(() => {
+        const savedContacts = JSON.parse(localStorage.getItem('contacts')) || [];
+        setContacts(savedContacts);
+      })
+      .catch((error) => {
+        console.error('Failed to initialize database', error);
+      });
+
     return () => {
       if (socket) {
         socket.close();
@@ -31,15 +39,17 @@ const Messenger = () => {
 
   const handleAddContact = async () => {
     try {
-      const response = await getContact(newContactUsername, newContactEmail);
+      const response = await addContact(newContactUsername, newContactEmail);
       const newContact = {
         username: newContactUsername,
         email: newContactEmail,
-        unique: response.data.unique
+        unique: response.data.unique,
+        roomId: response.data.room_id  // Получаем ID комнаты от сервера
       };
       const updatedContacts = [...contacts, newContact];
       setContacts(updatedContacts);
       localStorage.setItem('contacts', JSON.stringify(updatedContacts));
+      await saveContact(newContact); // Сохранение контакта в базу данных
       setOpen(false);
     } catch (error) {
       console.error('Error adding contact', error);
@@ -49,14 +59,15 @@ const Messenger = () => {
   const handleContactClick = async (contact) => {
     setCurrentChat(contact);
     try {
-      const contactMessages = await getMessagesByRecipient(contact.unique);
+      const contactMessages = await getMessagesByRecipient(unique, contact.unique);
       setMessages(contactMessages);
 
       if (socket) {
         socket.close();
       }
 
-      const socketInstance = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${contact.unique}/`);
+      const roomId = contact.roomId || await getRoomId(contact.unique);
+      const socketInstance = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomId}/`);
       setSocket(socketInstance);
 
       socketInstance.onopen = () => {
@@ -68,8 +79,13 @@ const Messenger = () => {
         const data = JSON.parse(event.data);
         if (data.type === 'message') {
           const message = data.message;
-          setMessages((prevMessages) => [...prevMessages, message]);
-          updateMessageStatus(message.id, 'delivered');
+          // Проверяем, что сообщение пришло от другого пользователя
+          if (message.sender_unique !== unique) {
+            setMessages((prevMessages) => [...prevMessages, message]);
+            saveMessage(message).catch(error => console.error('Error saving received message', error));
+            updateMessageStatus(message.id, 'delivered')
+              .catch(error => console.error('Error updating message status', error));
+          }
         }
       };
 
@@ -88,13 +104,15 @@ const Messenger = () => {
   const handleSendMessage = async () => {
     if (newMessage.trim() === '') return;
     const message = {
+      id: Date.now(),
       content: newMessage,
-      sender_username: 'You',
+      sender_username: username,
       recipient_unique: currentChat.unique,
       sender_unique: unique,
       status: 'pending',
-      timestamp: new Date().toISOString(),
+      date: new Date().toISOString(),
     };
+    console.log('Sending message:', message);
     try {
       await saveMessage(message);
       setMessages((prevMessages) => [...prevMessages, message]);
