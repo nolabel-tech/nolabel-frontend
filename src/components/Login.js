@@ -6,17 +6,44 @@ import { Button, TextField, Container, Typography, Box } from '@mui/material';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [serverError, setServerError] = useState('');
   const navigate = useNavigate();
 
+  const validateUsername = (value) => {
+    if (!value) {
+      setUsernameError('Username is required');
+      return false;
+    }
+    setUsernameError('');
+    return true;
+  };
+
+  const validatePassword = (value) => {
+    if (!value) {
+      setPasswordError('Password is required');
+      return false;
+    }
+    setPasswordError('');
+    return true;
+  };
+
   const handleLogin = async () => {
-    try {
-      const response = await login(username, password);
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('unique', response.data.unique); // Сохраняем уникальный идентификатор пользователя
-      localStorage.setItem('username', username); // Сохраняем имя пользователя
-      navigate('/messenger');
-    } catch (error) {
-      console.error('Login error', error);
+    const isUsernameValid = validateUsername(username);
+    const isPasswordValid = validatePassword(password);
+
+    if (isUsernameValid && isPasswordValid) {
+      try {
+        const response = await login(username, password);
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('unique', response.data.unique);
+        localStorage.setItem('username', username);
+        navigate('/messenger');
+      } catch (error) {
+        console.error('Login error', error);
+        setServerError(error.response.data.error || 'An error occurred');
+      }
     }
   };
 
@@ -41,6 +68,9 @@ const Login = () => {
             label="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            onBlur={() => validateUsername(username)}
+            helperText={usernameError || 'Enter your username'}
+            error={Boolean(usernameError)}
           />
           <TextField
             margin="normal"
@@ -50,7 +80,15 @@ const Login = () => {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onBlur={() => validatePassword(password)}
+            helperText={passwordError || 'Enter your password'}
+            error={Boolean(passwordError)}
           />
+          {serverError && (
+            <Typography color="error" variant="body2">
+              {serverError}
+            </Typography>
+          )}
           <Button
             fullWidth
             variant="contained"
